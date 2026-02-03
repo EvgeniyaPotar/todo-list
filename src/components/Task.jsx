@@ -1,52 +1,60 @@
-import { useContext, useState, useRef, useEffect } from 'react'
-import { TasksDispatchContext } from '../context/TasksContext.jsx'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import {
-    faPenToSquare,
-    faCircleXmark,
-} from '@fortawesome/free-regular-svg-icons'
+import { useState, useRef, useEffect, memo, useCallback } from 'react'
+import { FaRegTrashCan, FaRegCircleCheck, FaRegPenToSquare } from "react-icons/fa6";
+import { useTasksApi } from '../hooks/useTasksApi.jsx'
+import { Spin } from 'antd'
 
-const Task = ({ task }) => {
+const Task =({ task }) => {
+
     const [isEditTask, setIsEditTask] = useState(false)
     const [editText, setEditText] = useState(task.title)
     const [warning, setWarning] = useState('')
-    const dispatch = useContext(TasksDispatchContext)
+    const {deleteTask, changeTask, checkIsCompletedTask, loading, error} = useTasksApi()
 
     const inputRef = useRef(null)
     const buttonRef = useRef(null)
 
-    const activeEditTask = () => {
-        setIsEditTask((isEditTask) => !isEditTask)
-    }
+    const activeEditTask = useCallback(() => {
+        setIsEditTask((prev) => !prev)
+    }, [])
 
-    const onChangeEditText = (e) => {
+
+    const onChangeEditText = useCallback((e) => {
         setEditText(e.target.value)
-    }
+    }, [])
 
-    const saveEditTask = () => {
+
+    const saveEditTask = useCallback(() => {
         if (editText.trim() && editText.length > 0) {
-            dispatch({
-                type: 'change',
-                task: task,
-                title: editText,
-            })
-            setIsEditTask((isEditTask) => !isEditTask)
+            changeTask(task, editText)
+            setIsEditTask(false)
             setWarning('')
         } else {
             setWarning('Пустые или пробельные строки — не добавлять!')
         }
-    }
+    }, [editText, task, changeTask])
 
-    const cancelEditTask = () => {
+
+    const cancelEditTask = useCallback(() => {
         setEditText(task.title)
         setIsEditTask(false)
         setWarning('')
-    }
+    }, [task.title])
 
-    const typeKeyDown = (e) => {
+
+    const typeKeyDown = useCallback((e) => {
         if (e.key === 'Enter') saveEditTask()
         if (e.key === 'Escape') cancelEditTask()
-    }
+    }, [saveEditTask, cancelEditTask])
+
+
+    const handleCheckChange = useCallback(() => {
+        checkIsCompletedTask(task)
+    }, [task, checkIsCompletedTask])
+
+    const handleDelete = useCallback(() => {
+        deleteTask(task.id)
+    }, [task.id, deleteTask])
+
 
     useEffect(() => {
         if (!isEditTask) return
@@ -63,30 +71,31 @@ const Task = ({ task }) => {
 
         document.addEventListener('mousedown', onClickOutside)
         return () => document.removeEventListener('mousedown', onClickOutside)
-    }, [isEditTask])
+    }, [isEditTask,cancelEditTask])
+
+    if (error) return <p className='text-red-500'>Ошибка загрузки: {error}</p>
 
     return (
         <>
+            <Spin className='bg-white flex' spinning={loading}>
             <div>
                 <input
                     type="checkbox"
                     value={task.title}
                     name="taskTitle"
-                    checked={task.isDone}
-                    onChange={() =>
-                        dispatch({
-                            type: 'check',
-                            id: task.id,
-                        })
-                    }
+                    checked={task.isCompleted}
+                    onChange={handleCheckChange}
                 />
                 {!isEditTask ? (
-                    <label
-                        className={`self-center p-2 ${task.isDone ? 'line-through' : 'no-underline'}`}
-                        htmlFor="taskTitle"
-                    >
-                        {task.title}
-                    </label>
+
+                            <label
+                            className={`self-center p-2 ${task.isCompleted ? 'line-through' : 'no-underline'}`}
+                            htmlFor="taskTitle"
+                        >
+                            {task.title}
+                        </label>
+
+
                 ) : (
                     <input
                         className="p-1 m-2 border-1 border-gray-400 rounded-sm"
@@ -98,34 +107,30 @@ const Task = ({ task }) => {
                 )}
                 {!isEditTask ? (
                     <button
-                        className="p-1 hover:text-blue-800"
+                        className="p-1 hover:text-blue-800 text-green-800"
                         onClick={() => activeEditTask(task.id)}
                     >
-                        <FontAwesomeIcon icon={faPenToSquare} />
+                      <FaRegPenToSquare />
                     </button>
                 ) : (
                     <button
-                        className="p-1 mr-1 border-1 rounded-sm hover:text-blue-800"
+                        className="p-1 mr-1 hover:text-blue-800 text-green-600 "
                         ref={buttonRef}
                         onClick={saveEditTask}
                     >
-                        Сохранить
+                        <FaRegCircleCheck/>
                     </button>
                 )}
                 <button
-                    className="hover:text-blue-800"
-                    onClick={() =>
-                        dispatch({
-                            type: 'delete',
-                            id: task.id,
-                        })
-                    }
+                    className="hover:text-blue-800 text-red-400 "
+                    onClick={handleDelete}
                 >
-                    <FontAwesomeIcon icon={faCircleXmark} />
+                    <FaRegTrashCan  />
                 </button>
             </div>
+        </Spin>
             <p className="text-red-600">{warning}</p>
         </>
     )
 }
-export default Task
+export default  memo(Task)

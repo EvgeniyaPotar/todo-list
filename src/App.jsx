@@ -1,13 +1,20 @@
+import { Routes, Route  } from 'react-router'
 import './App.css'
-import Header from './Components/Header.jsx'
-import Main from './Components/Main.jsx'
+import TodoPage from './pages/TodoPage.jsx'
+import LoginPage from './pages/LoginPage.jsx'
+import PrivateRoute from './components/PrivateRoute.jsx'
+import RegistrationPage from './pages/RegistrationPage.jsx'
+
 
 function App() {
     return (
-        <div className="border-2">
-            <Header />
-            <Main />
-        </div>
+            <Routes>
+                <Route path="/" element={<LoginPage />} />
+                <Route path="/registration" element={<RegistrationPage />} />
+                <Route element={<PrivateRoute />}>
+                    <Route path="/todo" element={<TodoPage />} />
+                </Route>
+            </Routes>
     )
 }
 
