@@ -1,0 +1,1 @@
+export const  changeInputAction = (task) => ({type: 'change_input', payload: task})

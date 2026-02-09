@@ -1,36 +1,37 @@
-import { useContext, useState, useRef, useEffect } from 'react'
-import { TasksDispatchContext } from '../context/TasksContext.jsx'
+import { useState, useRef, useEffect } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import {
     faPenToSquare,
     faCircleXmark,
 } from '@fortawesome/free-regular-svg-icons'
+import { useDispatch, useSelector } from 'react-redux';
+import { startEditAction, changeEditInputAction, finishEditAction } from '../redux/actions/editTasksActions.js';
+import { deleteTaskAction, checkTaskAction, changeTaskAction } from '../redux/actions/tasksActions.js';
+
 
 const Task = ({ task }) => {
-    const [isEditTask, setIsEditTask] = useState(false)
-    const [editText, setEditText] = useState(task.title)
     const [warning, setWarning] = useState('')
-    const dispatch = useContext(TasksDispatchContext)
+
+    const dispatch = useDispatch();
+    const { isEditing, editingId, editingTitle } = useSelector(state => state.editTask);
+
+    const isEditingThisTask = isEditing && editingId === task.id;
 
     const inputRef = useRef(null)
     const buttonRef = useRef(null)
 
-    const activeEditTask = () => {
-        setIsEditTask((isEditTask) => !isEditTask)
-    }
+    const handleEditClick = () => {
+        dispatch(startEditAction(task.id, task.title));
+    };
 
-    const onChangeEditText = (e) => {
-        setEditText(e.target.value)
-    }
+    const handleInputChange = (e) => {
+        dispatch(changeEditInputAction(e.target.value));
+    };
 
     const saveEditTask = () => {
-        if (editText.trim() && editText.length > 0) {
-            dispatch({
-                type: 'change',
-                task: task,
-                title: editText,
-            })
-            setIsEditTask((isEditTask) => !isEditTask)
+        if (editingTitle.trim() && editingTitle.length > 0) {
+            dispatch(finishEditAction());
+            dispatch(changeTaskAction(task.id, editingTitle));
             setWarning('')
         } else {
             setWarning('Пустые или пробельные строки — не добавлять!')
@@ -38,10 +39,17 @@ const Task = ({ task }) => {
     }
 
     const cancelEditTask = () => {
-        setEditText(task.title)
-        setIsEditTask(false)
+        dispatch(finishEditAction());
         setWarning('')
     }
+
+    const handleDelete = () => {
+        dispatch(deleteTaskAction(task.id));
+    };
+    const handleCheck = () => {
+        dispatch(checkTaskAction(task.id));
+    };
+
 
     const typeKeyDown = (e) => {
         if (e.key === 'Enter') saveEditTask()
@@ -49,7 +57,7 @@ const Task = ({ task }) => {
     }
 
     useEffect(() => {
-        if (!isEditTask) return
+        if (!isEditingThisTask) return
 
         const onClickOutside = (e) => {
             const isInsideWrapper = inputRef.current?.contains(e.target)
@@ -63,7 +71,7 @@ const Task = ({ task }) => {
 
         document.addEventListener('mousedown', onClickOutside)
         return () => document.removeEventListener('mousedown', onClickOutside)
-    }, [isEditTask])
+    }, [isEditingThisTask])
 
     return (
         <>
@@ -73,14 +81,9 @@ const Task = ({ task }) => {
                     value={task.title}
                     name="taskTitle"
                     checked={task.isDone}
-                    onChange={() =>
-                        dispatch({
-                            type: 'check',
-                            id: task.id,
-                        })
-                    }
+                    onChange={handleCheck}
                 />
-                {!isEditTask ? (
+                {!isEditingThisTask ? (
                     <label
                         className={`self-center p-2 ${task.isDone ? 'line-through' : 'no-underline'}`}
                         htmlFor="taskTitle"
@@ -90,16 +93,16 @@ const Task = ({ task }) => {
                 ) : (
                     <input
                         className="p-1 m-2 border-1 border-gray-400 rounded-sm"
-                        value={editText}
+                        value={editingTitle}
                         ref={inputRef}
-                        onChange={onChangeEditText}
+                        onChange={handleInputChange}
                         onKeyDown={typeKeyDown}
                     />
                 )}
-                {!isEditTask ? (
+                {!isEditingThisTask? (
                     <button
                         className="p-1 hover:text-blue-800"
-                        onClick={() => activeEditTask(task.id)}
+                        onClick={handleEditClick}
                     >
                         <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
@@ -114,12 +117,7 @@ const Task = ({ task }) => {
                 )}
                 <button
                     className="hover:text-blue-800"
-                    onClick={() =>
-                        dispatch({
-                            type: 'delete',
-                            id: task.id,
-                        })
-                    }
+                    onClick={handleDelete}
                 >
                     <FontAwesomeIcon icon={faCircleXmark} />
                 </button>

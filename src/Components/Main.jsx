@@ -1,15 +1,16 @@
-import { TasksProvider } from '../provider/TaskProvider.jsx'
 import InputTask from './InputTask.jsx'
 import TodoList from './TodoList.jsx'
+import { withLogger } from '../HOC/withLogger.jsx'
+
+const WrapTodoList = withLogger(TodoList)
 
 const Main = () => {
+
     return (
-        <TasksProvider>
-            <div className="p-5 border-t-2 flex flex-col">
-                <InputTask />
-                <TodoList />
-            </div>
-        </TasksProvider>
+        <div className="p-5 border-t-2 flex flex-col">
+            <InputTask />
+            <WrapTodoList />
+        </div>
     )
 }
 

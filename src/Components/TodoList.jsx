@@ -1,12 +1,13 @@
 import Task from './Task.jsx'
-import { useContext, useState } from 'react'
-import { TasksContext, TasksDispatchContext } from '../context/TasksContext.jsx'
+import { useState } from 'react'
 import NavBar from './NavBar.jsx'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteCompletedAction } from '../redux/actions/tasksActions.js'
 
 const TodoList = () => {
-    const tasks = useContext(TasksContext)
+    const { tasks } = useSelector(store => store.tasks)
     const [filter, setFilter] = useState('all')
-    const dispatch = useContext(TasksDispatchContext)
+    const dispatch = useDispatch()
 
     const filtredTasks = tasks.filter((task) => {
         if (filter === 'active') return !task.isDone
@@ -33,9 +34,7 @@ const TodoList = () => {
                 <button
                     className="p-1 border-1 rounded-sm hover:text-blue-800"
                     onClick={() =>
-                        dispatch({
-                            type: 'deleteCompleted',
-                        })
+                        dispatch(deleteCompletedAction())
                     }
                 >
                     Очистить выполненные

@@ -1,33 +1,32 @@
-import { useContext, useState } from 'react'
-import { TasksDispatchContext } from '../context/TasksContext.jsx'
+import {  useState } from 'react'
+import { addTaskAction } from '../redux/actions/tasksActions.js'
+import { useDispatch, useSelector } from 'react-redux'
+import { changeInputAction } from '../redux/actions/inputTaskAction.js'
 import { v1 as uuid1 } from 'uuid'
 
 const InputTask = () => {
-    const [inputText, setInputText] = useState('')
     const [warning, setWarning] = useState('')
-    const dispatch = useContext(TasksDispatchContext)
+    const dispatch = useDispatch()
+    const { text } = useSelector(store => store.text)
 
     const onChangeText = (e) => {
-        setInputText(e.target.value)
+        dispatch(changeInputAction(e.target.value))
         setWarning('')
     }
 
     const addTask = () => {
-        inputText.trim() && inputText.length > 0
-            ? dispatch({
-                  id: uuid1(),
-                  type: 'add',
-                  title: inputText,
-              })
+        text.trim() && text.length > 0
+            ? dispatch(addTaskAction({ id: uuid1(), title: text, isDone: false}))
+
             : setWarning('Пустые или пробельные строки — не добавлять!')
-        setInputText('')
+        dispatch(changeInputAction(''))
     }
 
     return (
         <div className="mb-3">
             <input
                 className="p-1 mr-2 mb-2 border-1 border-gray-400  rounded-sm"
-                value={inputText}
+                value={text}
                 type="text"
                 onChange={onChangeText}
                 placeholder="Введите тест задачи..."
