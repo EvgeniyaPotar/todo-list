@@ -4,43 +4,44 @@ import { useSelector } from 'react-redux'
 export function withLogger(WrappedComponent) {
     return (props) => {
 
-        const { lastAction } = useSelector((store) => store.logger)
+        const lastAction = useSelector((store) => store.logger.lastAction)
 
         useEffect(() => {
             if (lastAction) {
                 switch (lastAction.type) {
-                    case "add":
-                        console.log("add task:", lastAction.payload);
-                        break;
+                    case 'tasks/addTask':
+                        console.log('Добавлена задача:', lastAction.payload)
+                        break
 
-                    case "change_input":
-                        console.log("change_input", lastAction.payload);
-                        break;
+                    case 'EditTaskInput/startEdit':
+                    case 'EditTaskInput/changeEditInput':
+                    case 'EditTaskInput/finishEdit':
+                        console.log(
+                            'Редактирование:',
+                            lastAction.type,
+                            lastAction.payload
+                        )
+                        break
 
-                    case "start_edit":
-                    case "change_edit_input":
-                    case "finish_edit":
-                        console.log("edit task", lastAction.payload);
-                        break;
+                    case 'tasks/checkTask':
+                        console.log(
+                            'Статус задачи изменен:',
+                            lastAction.payload
+                        )
+                        break
 
-                    case "check":
-                        console.log("check task", lastAction.payload);
-                        break;
+                    case 'tasks/changeTask':
+                        console.log('Текст задачи изменен:', lastAction.payload)
+                        break
 
-                    case "change":
-                        console.log("change task", lastAction.payload);
-                        break;
+                    case 'tasks/deleteTask':
+                        console.log('Задача удалена:', lastAction.payload)
+                        break
 
-                    case "delete":
-                        console.log("delete task", lastAction.payload);
-                        break;
+                    case 'tasks/deleteCompletedTasks':
+                        console.log('Удалены все выполненные задачи')
+                        break
 
-                    case "deleteCompleted":
-                        console.log("delete completed tasks");
-                        break;
-
-                    default:
-                        console.log("Component rendering:", WrappedComponent.name);
                 }
             }
         },[lastAction])

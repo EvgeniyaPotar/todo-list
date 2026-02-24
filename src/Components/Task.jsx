@@ -5,8 +5,16 @@ import {
     faCircleXmark,
 } from '@fortawesome/free-regular-svg-icons'
 import { useDispatch, useSelector } from 'react-redux';
-import { startEditAction, changeEditInputAction, finishEditAction } from '../redux/actions/editTasksActions.js';
-import { deleteTaskAction, checkTaskAction, changeTaskAction } from '../redux/actions/tasksActions.js';
+import {
+    startEdit,
+    changeEditInput,
+    finishEdit,
+} from '../redux/slices/editTasksSlice.js'
+import {
+    deleteTask,
+    changeTask,
+    checkTask,
+} from '../redux/slices/tasksSlice.js'
 
 
 const Task = ({ task }) => {
@@ -21,17 +29,17 @@ const Task = ({ task }) => {
     const buttonRef = useRef(null)
 
     const handleEditClick = () => {
-        dispatch(startEditAction(task.id, task.title));
-    };
+        dispatch(startEdit({ id: task.id, title: task.title }))
+    }
 
     const handleInputChange = (e) => {
-        dispatch(changeEditInputAction(e.target.value));
+        dispatch(changeEditInput(e.target.value))
     };
 
     const saveEditTask = () => {
         if (editingTitle.trim() && editingTitle.length > 0) {
-            dispatch(finishEditAction());
-            dispatch(changeTaskAction(task.id, editingTitle));
+            dispatch(changeTask({ id: task.id, title: editingTitle}))
+            dispatch(finishEdit())
             setWarning('')
         } else {
             setWarning('Пустые или пробельные строки — не добавлять!')
@@ -39,15 +47,15 @@ const Task = ({ task }) => {
     }
 
     const cancelEditTask = () => {
-        dispatch(finishEditAction());
+        dispatch(finishEdit())
         setWarning('')
     }
 
     const handleDelete = () => {
-        dispatch(deleteTaskAction(task.id));
+        dispatch(deleteTask(task.id))
     };
     const handleCheck = () => {
-        dispatch(checkTaskAction(task.id));
+        dispatch(checkTask(task.id))
     };
 
 

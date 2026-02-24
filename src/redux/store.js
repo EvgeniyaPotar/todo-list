@@ -1,8 +1,8 @@
-import { legacy_createStore as createStore, combineReducers} from 'redux';
-import tasksReducer from './reducers/tasksReducer.js'
-import inputTaskReducer from './reducers/inputTaskReducer.js'
-import editTaskReducer from './reducers/editTaskReducer.js'
-import loggerReducer from './reducers/loggerReducer.js'
+import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import tasksReducer from './slices/tasksSlice.js'
+import inputTaskReducer from './slices/inputTaskSlice.js'
+import editTaskReducer from './slices/editTasksSlice.js'
+import loggerReducer from './slices/loggerSlice.js'
 
 const rootReducer = combineReducers({
     text: inputTaskReducer,
@@ -11,8 +11,8 @@ const rootReducer = combineReducers({
     logger: loggerReducer
 });
 
-const store = createStore(rootReducer,
-      window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-);
+const store = configureStore({
+    reducer: rootReducer,
+})
 
 export default store;
