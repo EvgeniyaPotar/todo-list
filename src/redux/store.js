@@ -7,9 +7,9 @@ import loggerReducer from './slices/loggerSlice.js'
 const rootReducer = combineReducers({
     text: inputTaskReducer,
     tasks: tasksReducer,
-    editTask: editTaskReducer,
-    logger: loggerReducer
-});
+    editTaskInput: editTaskReducer,
+    logger: loggerReducer,
+})
 
 const store = configureStore({
     reducer: rootReducer,

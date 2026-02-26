@@ -4,11 +4,14 @@ import {
     faPenToSquare,
     faCircleXmark,
 } from '@fortawesome/free-regular-svg-icons'
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'
 import {
     startEdit,
     changeEditInput,
     finishEdit,
+    isEditingTask,
+    editingIdTask,
+    editingTitleTask,
 } from '../redux/slices/editTasksSlice.js'
 import {
     deleteTask,
@@ -21,7 +24,10 @@ const Task = ({ task }) => {
     const [warning, setWarning] = useState('')
 
     const dispatch = useDispatch();
-    const { isEditing, editingId, editingTitle } = useSelector(state => state.editTask);
+    const isEditing = useSelector(isEditingTask)
+    const editingTitle = useSelector(editingTitleTask)
+    const editingId = useSelector(editingIdTask)
+
 
     const isEditingThisTask = isEditing && editingId === task.id;
 

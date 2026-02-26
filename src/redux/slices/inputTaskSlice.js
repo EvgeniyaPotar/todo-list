@@ -12,7 +12,11 @@ const inputTaskSlice = createSlice({
             state.value = action.payload
         },
     },
+    selectors: {
+        inputText: (sliceState) => sliceState.value
+    }
 })
 
 export const { changeInput } = inputTaskSlice.actions
+export const { inputText } = inputTaskSlice.selectors
 export default inputTaskSlice.reducer

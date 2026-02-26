@@ -7,7 +7,7 @@ const initialState = {
 }
 
 const editTaskSlice = createSlice({
-    name: 'EditTaskInput',
+    name: 'editTaskInput',
     initialState,
     reducers: {
         startEdit(state, action) {
@@ -20,9 +20,15 @@ const editTaskSlice = createSlice({
         },
         finishEdit() {
             return initialState
-        }
+        },
+    },
+    selectors: {
+        isEditingTask: (sliceState) => sliceState.isEditing,
+        editingIdTask: (sliceState) => sliceState.editingId,
+        editingTitleTask: (sliceState) => sliceState.editingTitle
     },
 })
 
 export const { startEdit, changeEditInput, finishEdit } = editTaskSlice.actions
+export const { isEditingTask, editingIdTask, editingTitleTask } = editTaskSlice.selectors
 export default editTaskSlice.reducer

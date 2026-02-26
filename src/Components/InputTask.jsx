@@ -1,13 +1,13 @@
 import {  useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { changeInput} from '../redux/slices/inputTaskSlice.js'
+import { changeInput, inputText} from '../redux/slices/inputTaskSlice.js'
 import { addTask } from '../redux/slices/tasksSlice.js'
 
 
 const InputTask = () => {
     const [warning, setWarning] = useState('')
     const dispatch = useDispatch()
-    const { value: text } = useSelector(store => store.text)
+    const text = useSelector(inputText)
 
     const onChangeText = (e) => {
         dispatch(changeInput(e.target.value))
