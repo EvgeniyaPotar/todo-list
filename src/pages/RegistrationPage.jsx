@@ -14,9 +14,7 @@ const RegistrationPage = () => {
     } = useForm();
 
     const dispatch = useDispatch()
-    const {
-        errorAuth: errorRegistr,
-    } = useSelector((store) => store.auth)
+    const { errorRegistr } = useSelector((store) => store.auth)
     const navigate = useNavigate()
 
     const [messageApi, contextHolder] = message.useMessage();

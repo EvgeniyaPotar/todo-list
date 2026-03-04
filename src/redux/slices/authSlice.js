@@ -66,6 +66,7 @@ const initialState = {
     token: '',
     isLoading: false,
     errorAuth: null,
+    errorRegist: null
 }
 
 const authSlice = createSlice({
@@ -90,13 +91,13 @@ const authSlice = createSlice({
             .addCase(registrationUser.fulfilled, (state, action) => {
                 state.user = action.payload
                 state.isLoading = false
-                state.errorAuth = null
+                state.errorRegist = null
             })
             .addCase(registrationUser.pending, (state, action) => {
                 state.isLoading = action.payload
             })
             .addCase(registrationUser.rejected, (state, action) => {
-                state.errorAuth = action.payload
+                state.errorRegist = action.payload
                 state.isLoading = false
             })
 
