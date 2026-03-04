@@ -1,14 +1,15 @@
 import { useState, useRef, useEffect, memo, useCallback } from 'react'
 import { FaRegTrashCan, FaRegCircleCheck, FaRegPenToSquare } from "react-icons/fa6";
-import { useTasksApi } from '../hooks/useTasksApi.jsx'
-import { Spin } from 'antd'
+import { useDispatch, useSelector } from 'react-redux'
+import { deleteTask,changeTask, checkIsCompletedTask } from '../redux/slices/tasksSlice.js'
+
 
 const Task =({ task }) => {
-
     const [isEditTask, setIsEditTask] = useState(false)
     const [editText, setEditText] = useState(task.title)
     const [warning, setWarning] = useState('')
-    const {deleteTask, changeTask, checkIsCompletedTask, loading, error} = useTasksApi()
+    const dispatch = useDispatch()
+    const {error} =useSelector(store => store.tasks)
 
     const inputRef = useRef(null)
     const buttonRef = useRef(null)
@@ -25,13 +26,18 @@ const Task =({ task }) => {
 
     const saveEditTask = useCallback(() => {
         if (editText.trim() && editText.length > 0) {
-            changeTask(task, editText)
+            dispatch(
+                changeTask({
+                    task: task,
+                    editText: editText.trim(),
+                })
+            )
             setIsEditTask(false)
             setWarning('')
         } else {
             setWarning('Пустые или пробельные строки — не добавлять!')
         }
-    }, [editText, task, changeTask])
+    }, [editText, task, dispatch])
 
 
     const cancelEditTask = useCallback(() => {
@@ -48,12 +54,12 @@ const Task =({ task }) => {
 
 
     const handleCheckChange = useCallback(() => {
-        checkIsCompletedTask(task)
-    }, [task, checkIsCompletedTask])
+        dispatch(checkIsCompletedTask(task))
+    }, [task, dispatch])
 
     const handleDelete = useCallback(() => {
-        deleteTask(task.id)
-    }, [task.id, deleteTask])
+        dispatch(deleteTask(task.id))
+    },[task.id, dispatch])
 
 
     useEffect(() => {
@@ -77,13 +83,13 @@ const Task =({ task }) => {
 
     return (
         <>
-            <Spin className='bg-white flex' spinning={loading}>
+            {/*<Spin className='bg-white flex' spinning={loading}>*/}
             <div>
                 <input
                     type="checkbox"
                     value={task.title}
                     name="taskTitle"
-                    checked={task.isCompleted}
+                    checked={!!task.isCompleted}
                     onChange={handleCheckChange}
                 />
                 {!isEditTask ? (
@@ -128,7 +134,7 @@ const Task =({ task }) => {
                     <FaRegTrashCan  />
                 </button>
             </div>
-        </Spin>
+        {/*</Spin>*/}
             <p className="text-red-600">{warning}</p>
         </>
     )

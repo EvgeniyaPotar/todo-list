@@ -1,10 +1,11 @@
 import { useState,useCallback } from 'react'
-import { useTasksApi } from '../hooks/useTasksApi.jsx'
+import { useDispatch } from 'react-redux'
+import { addNewTask } from '../redux/slices/tasksSlice.js'
 
 const InputTask = () => {
+    const dispatch = useDispatch()
     const [inputText, setInputText] = useState('')
     const [warning, setWarning] = useState('')
-    const {addNewTask} = useTasksApi()
 
     const onChangeText = useCallback((e) => {
         setInputText(e.target.value)
@@ -14,13 +15,13 @@ const InputTask = () => {
 
     const addTask = useCallback(() => {
         if (inputText.trim() && inputText.length > 0) {
-            addNewTask(inputText)
+            dispatch(addNewTask(inputText.trim()))
             setInputText('')
             setWarning('')
         } else {
             setWarning('Пустые или пробельные строки — не добавлять!')
         }
-    }, [inputText, addNewTask])
+    }, [inputText,dispatch])
 
     const handleKeyDown = useCallback((e) => {
         if (e.key === 'Enter') addTask()

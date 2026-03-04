@@ -1,11 +1,10 @@
 import { Navigate, Outlet } from 'react-router';
-import AuthContext from '../context/AuthContext.jsx'
-import { useContext } from 'react'
 import { Spin } from 'antd'
+import { useSelector } from 'react-redux'
 
 
 const PrivateRoute = () => {
-        const {token, isLoading } = useContext(AuthContext)
+    const { token,isLoading } = useSelector((store) => store.auth)
 
         if (isLoading) {
             return  <Spin className='bg-white' spinning={isLoading} />

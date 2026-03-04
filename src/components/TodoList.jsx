@@ -1,21 +1,20 @@
 import Task from './Task.jsx'
-import { useContext, useState, useMemo, useEffect, memo,useCallback } from 'react'
-import { TasksContext } from '../context/TasksContext.jsx'
+import {useState, useMemo, useEffect, memo,useCallback } from 'react'
 import NavBar from './NavBar.jsx'
-import { useTasksApi } from '../hooks/useTasksApi.jsx'
 import { Spin } from 'antd'
+import { getAllTasks, deleteTask } from '../redux/slices/tasksSlice.js'
+import { useDispatch, useSelector } from 'react-redux'
 
 
 const TodoList = () => {
-    const { getAllTasks, deleteTask, error, loading } = useTasksApi(true)
+    const { tasks, error, isLoading: loading } = useSelector((store) => store.tasks)
+    const dispatch = useDispatch()
 
-    const tasks = useContext(TasksContext)
     const [filter, setFilter] = useState('all')
 
-
     useEffect(() => {
-        getAllTasks();
-    }, []);
+        dispatch(getAllTasks())
+    }, [dispatch]);
 
 
     const filteredTasks = useMemo(() => {
@@ -34,8 +33,8 @@ const TodoList = () => {
             .filter(task => task.isCompleted)
             .map(task => task.id)
 
-        completedIds.forEach(id => deleteTask(id))
-    }, [tasks, deleteTask])
+        completedIds.forEach((id) => dispatch(deleteTask(id)))
+    }, [tasks, dispatch])
 
     const remainingCount = useMemo(() => {
         return tasks.filter((task) => !task.isCompleted).length
