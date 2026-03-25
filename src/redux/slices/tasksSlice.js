@@ -120,7 +120,7 @@ const initialState = {
 const tasksSlice = createSlice({
     name: 'tasks',
     initialState,
-    extraReducers:(builder) => {
+    extraReducers: (builder) => {
         builder
             .addCase(getAllTasks.fulfilled, (state, action) => {
                 state.tasks = action.payload
@@ -188,9 +188,12 @@ const tasksSlice = createSlice({
                     state.isLoading = false
                 }
             )
-
-
-    }
+    },
+    selectors: {
+        errorTask: (sliceState) => sliceState.error,
+    },
 })
 
+
+export const { errorTask } = tasksSlice.selectors
 export default tasksSlice.reducer

@@ -40,7 +40,7 @@ const TodoList = () => {
         return tasks.filter((task) => !task.isCompleted).length
     }, [tasks])
 
-    const memoFilteredList = useMemo(() => {
+    const  memoFilteredList = useMemo(() => {
         return [...filteredTasks]
             .reverse()
             .map(task => <Task key={task.id} task={task} />)

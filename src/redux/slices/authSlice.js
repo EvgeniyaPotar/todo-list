@@ -78,7 +78,6 @@ const authSlice = createSlice({
                     login: action.meta.arg.email,
                     password: action.meta.arg.password,
                 }
-                localStorage.setItem('token', state.token)
                 state.isLoading = false
                 state.errorAuth = null
             })
@@ -108,7 +107,6 @@ const authSlice = createSlice({
         logout(state) {
         state.user = {}
         state.token = ''
-        localStorage.removeItem('token')
         },
     },
 })

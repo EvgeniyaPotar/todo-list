@@ -1,35 +1,43 @@
 import { useState, useRef, useEffect, memo, useCallback } from 'react'
 import { FaRegTrashCan, FaRegCircleCheck, FaRegPenToSquare } from "react-icons/fa6";
 import { useDispatch, useSelector } from 'react-redux'
-import { deleteTask,changeTask, checkIsCompletedTask } from '../redux/slices/tasksSlice.js'
+
+import {
+    deleteTask,
+    changeTask,
+    checkIsCompletedTask,
+    errorTask
+} from '../redux/slices/tasksSlice.js'
 
 
 const Task =({ task }) => {
+    const error = useSelector(errorTask)
     const [isEditTask, setIsEditTask] = useState(false)
     const [editText, setEditText] = useState(task.title)
     const [warning, setWarning] = useState('')
     const dispatch = useDispatch()
-    const {error} =useSelector(store => store.tasks)
+    const editTextRef = useRef(editText)
+
 
     const inputRef = useRef(null)
     const buttonRef = useRef(null)
 
-    const activeEditTask = useCallback(() => {
+    const activeEditTask = () => {
         setIsEditTask((prev) => !prev)
-    }, [])
+    }
 
-
-    const onChangeEditText = useCallback((e) => {
+    const onChangeEditText =(e) => {
         setEditText(e.target.value)
-    }, [])
+    }
 
 
     const saveEditTask = useCallback(() => {
-        if (editText.trim() && editText.length > 0) {
+        const currentText = editTextRef.current.trim()
+        if (currentText) {
             dispatch(
                 changeTask({
                     task: task,
-                    editText: editText.trim(),
+                    editText: currentText,
                 })
             )
             setIsEditTask(false)
@@ -37,7 +45,7 @@ const Task =({ task }) => {
         } else {
             setWarning('Пустые или пробельные строки — не добавлять!')
         }
-    }, [editText, task, dispatch])
+    }, [task, dispatch])
 
 
     const cancelEditTask = useCallback(() => {
@@ -53,13 +61,13 @@ const Task =({ task }) => {
     }, [saveEditTask, cancelEditTask])
 
 
-    const handleCheckChange = useCallback(() => {
+    const handleCheckChange =() => {
         dispatch(checkIsCompletedTask(task))
-    }, [task, dispatch])
+    }
 
-    const handleDelete = useCallback(() => {
+    const handleDelete = () => {
         dispatch(deleteTask(task.id))
-    },[task.id, dispatch])
+    }
 
 
     useEffect(() => {
@@ -79,7 +87,12 @@ const Task =({ task }) => {
         return () => document.removeEventListener('mousedown', onClickOutside)
     }, [isEditTask,cancelEditTask])
 
-    if (error) return <p className='text-red-500'>Ошибка загрузки: {error}</p>
+    useEffect(() => {
+        editTextRef.current = editText
+    }, [editText])
+
+    if (error)
+        return <p className="text-red-500">Ошибка загрузки: {error}</p>
 
     return (
         <>
